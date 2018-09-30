@@ -100,14 +100,14 @@ function init() {
     // testBall = new Ball(innerWidth/2,innerHeight/2,20,colors[1],0.6,0,0);
     ballArray = []
     let maxRadius = 60;
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 200; i++) {
         let speedX = utils.randomFloatFromRange(-1,1,0);
         let speedY = utils.randomFloatFromRange(-1,1,0);
         let color = utils.randomColor(colors);
         let maxOpacity = 0.6;
         let x = utils.randomIntFromRange(maxRadius+1,innerWidth-maxRadius-1,0);
         let y = utils.randomIntFromRange(maxRadius+1,innerHeight-maxRadius-1,0);
-        let radius = utils.randomFloatFromRange(8,maxRadius,0);
+        let radius = utils.randomFloatFromRange(2,maxRadius,0);
         let ball = new Ball(x,y,radius,color,maxOpacity,speedX,speedY);
         while(hasOverlap(ballArray, ball)) {
           x = utils.randomIntFromRange(25,innerWidth-25,0);

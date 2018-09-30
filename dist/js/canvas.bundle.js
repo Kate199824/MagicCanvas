@@ -202,14 +202,14 @@ function init() {
     // testBall = new Ball(innerWidth/2,innerHeight/2,20,colors[1],0.6,0,0);
     ballArray = [];
     var maxRadius = 60;
-    for (var i = 0; i < 300; i++) {
+    for (var i = 0; i < 200; i++) {
         var speedX = _utils2.default.randomFloatFromRange(-1, 1, 0);
         var speedY = _utils2.default.randomFloatFromRange(-1, 1, 0);
         var color = _utils2.default.randomColor(colors);
         var maxOpacity = 0.6;
         var x = _utils2.default.randomIntFromRange(maxRadius + 1, innerWidth - maxRadius - 1, 0);
         var y = _utils2.default.randomIntFromRange(maxRadius + 1, innerHeight - maxRadius - 1, 0);
-        var radius = _utils2.default.randomFloatFromRange(8, maxRadius, 0);
+        var radius = _utils2.default.randomFloatFromRange(2, maxRadius, 0);
         var ball = new Ball(x, y, radius, color, maxOpacity, speedX, speedY);
         while (hasOverlap(ballArray, ball)) {
             x = _utils2.default.randomIntFromRange(25, innerWidth - 25, 0);
