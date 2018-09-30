@@ -1,3 +1,5 @@
+import utils from './utils';
+
 function rotate(velocity, angle) {
   const rotatedVelocities = {
     x: velocity.x * Math.cos(angle) - velocity.y * Math.sin(angle),
@@ -37,4 +39,30 @@ function resolveCollision(particle, otherParticle) {
   }
 }
 
-module.exports = { resolveCollision };
+function attractionGravity(mouse, particle) {
+  const G = 15;
+  const angle =  Math.atan((particle.y - mouse.y) / (mouse.x - particle.x));
+
+  const M = mouse.mass;
+  const m = particle.mass;
+
+  const distance = utils.distance(mouse.x,mouse.y,particle.x,particle.y);
+  if(distance <= (particle.radius + mouse.radius)) {
+    particle.velocity.x = 0;
+    particle.velocity.y = 0;
+    return;
+  }
+
+  const F = (G * M * m) / (distance * distance);
+
+  const a = F / m;
+
+  const ay = a * Math.cos(angle) * (particle.y > mouse.y ? -1 : 1);
+  const ax = a * Math.cos(angle) * (particle.x > mouse.x ? -1 : 1);
+
+  particle.velocity.x += ax;
+  particle.velocity.y += ay;
+
+}
+
+module.exports = { resolveCollision, attractionGravity };

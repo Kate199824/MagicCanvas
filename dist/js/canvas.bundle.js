@@ -113,8 +113,10 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 var mouse = {
-    x: innerWidth / 2,
-    y: innerHeight / 2
+    x: innerWidth / 3,
+    y: innerHeight / 3,
+    mass: 10,
+    radius: 10
 };
 
 var colors = ['#2185C5', '#7ECEFD', '#FF7F66'];
@@ -141,7 +143,6 @@ function Ball(x, y, radius, color, maxOpacity, speedX, speedY) {
     this.opacity = 0;
     this.maxOpacity = maxOpacity;
     this.velocity = { x: speedX, y: speedY };
-    this.acceleration = { x: 0, y: 0 };
     this.mass = radius * radius;
 
     this.draw = function () {
@@ -180,11 +181,6 @@ function Ball(x, y, radius, color, maxOpacity, speedX, speedY) {
             this.opacity = Math.max(this.opacity, 0);
         }
 
-        //change direction when touch mouse
-        // if(utils.distance(this.x, this.y, mouse.x, mouse.y) < 80 && this.opacity < this.maxOpacity){
-        //   this.opacity += 0.001;
-        //   this.opacity = Math.max(this.opacity, this.maxOpacity);
-        // }
         this.draw();
     };
 }
@@ -200,17 +196,20 @@ function hasOverlap(ballArray, ball) {
 
 // Implementation
 var ballArray = [];
+var testBall = void 0;
 function init() {
     console.log("init");
+    // testBall = new Ball(innerWidth/2,innerHeight/2,20,colors[1],0.6,0,0);
     ballArray = [];
-    for (var i = 0; i < 200; i++) {
+    var maxRadius = 60;
+    for (var i = 0; i < 300; i++) {
         var speedX = _utils2.default.randomFloatFromRange(-1, 1, 0);
         var speedY = _utils2.default.randomFloatFromRange(-1, 1, 0);
         var color = _utils2.default.randomColor(colors);
         var maxOpacity = 0.6;
-        var x = _utils2.default.randomIntFromRange(45, innerWidth - 45, 0);
-        var y = _utils2.default.randomIntFromRange(45, innerHeight - 45, 0);
-        var radius = _utils2.default.randomFloatFromRange(10, 40, 0);
+        var x = _utils2.default.randomIntFromRange(maxRadius + 1, innerWidth - maxRadius - 1, 0);
+        var y = _utils2.default.randomIntFromRange(maxRadius + 1, innerHeight - maxRadius - 1, 0);
+        var radius = _utils2.default.randomFloatFromRange(8, maxRadius, 0);
         var ball = new Ball(x, y, radius, color, maxOpacity, speedX, speedY);
         while (hasOverlap(ballArray, ball)) {
             x = _utils2.default.randomIntFromRange(25, innerWidth - 25, 0);
@@ -225,11 +224,15 @@ function init() {
 
 // Animation Loop
 function animate() {
-    console.log("animate");
+    console.log("ani");
     c.clearRect(0, 0, innerWidth, innerHeight);
+    // testBall.update();
+    // myMath.attractionGravity(mouse,testBall);
     requestAnimationFrame(animate);
+
     for (var i = 0; i < ballArray.length; i++) {
-        for (var j = i + 1; j < ballArray.length; j++) {
+        _math2.default.attractionGravity(mouse, ballArray[i]);
+        for (var j = 0; j < ballArray.length; j++) {
             if (_utils2.default.distance(ballArray[i].x, ballArray[i].y, ballArray[j].x, ballArray[j].y) <= ballArray[i].radius + ballArray[j].radius) {
                 _math2.default.resolveCollision(ballArray[i], ballArray[j]);
             }
@@ -252,6 +255,12 @@ animate();
 
 "use strict";
 
+
+var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
+var _utils2 = _interopRequireDefault(_utils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function rotate(velocity, angle) {
   var rotatedVelocities = {
@@ -292,7 +301,32 @@ function resolveCollision(particle, otherParticle) {
   }
 }
 
-module.exports = { resolveCollision: resolveCollision };
+function attractionGravity(mouse, particle) {
+  var G = 15;
+  var angle = Math.atan((particle.y - mouse.y) / (mouse.x - particle.x));
+
+  var M = mouse.mass;
+  var m = particle.mass;
+
+  var distance = _utils2.default.distance(mouse.x, mouse.y, particle.x, particle.y);
+  if (distance <= particle.radius + mouse.radius) {
+    particle.velocity.x = 0;
+    particle.velocity.y = 0;
+    return;
+  }
+
+  var F = G * M * m / (distance * distance);
+
+  var a = F / m;
+
+  var ay = a * Math.cos(angle) * (particle.y > mouse.y ? -1 : 1);
+  var ax = a * Math.cos(angle) * (particle.x > mouse.x ? -1 : 1);
+
+  particle.velocity.x += ax;
+  particle.velocity.y += ay;
+}
+
+module.exports = { resolveCollision: resolveCollision, attractionGravity: attractionGravity };
 
 /***/ }),
 

@@ -8,8 +8,10 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 const mouse = {
-    x: innerWidth / 2,
-    y: innerHeight / 2
+    x: innerWidth / 3,
+    y: innerHeight / 3,
+    mass : 10,
+    radius: 10,
 };
 
 const colors = ['#2185C5', '#7ECEFD', '#FF7F66'];
@@ -36,7 +38,6 @@ function Ball(x, y, radius, color, maxOpacity, speedX, speedY) {
     this.opacity = 0;
     this.maxOpacity = maxOpacity;
     this.velocity = { x: speedX, y: speedY };
-    this.acceleration = { x: 0, y: 0 };
     this.mass = radius * radius;
 
 
@@ -77,11 +78,7 @@ function Ball(x, y, radius, color, maxOpacity, speedX, speedY) {
             this.opacity = Math.max(this.opacity, 0);
         }
 
-        //change direction when touch mouse
-        // if(utils.distance(this.x, this.y, mouse.x, mouse.y) < 80 && this.opacity < this.maxOpacity){
-        //   this.opacity += 0.001;
-        //   this.opacity = Math.max(this.opacity, this.maxOpacity);
-        // }
+
         this.draw();
     }
 }
@@ -97,17 +94,20 @@ function hasOverlap(ballArray, ball) {
 
 // Implementation
 let ballArray = [];
+let testBall ;
 function init() {
     console.log("init");
+    // testBall = new Ball(innerWidth/2,innerHeight/2,20,colors[1],0.6,0,0);
     ballArray = []
-    for (let i = 0; i < 200; i++) {
+    let maxRadius = 60;
+    for (let i = 0; i < 300; i++) {
         let speedX = utils.randomFloatFromRange(-1,1,0);
         let speedY = utils.randomFloatFromRange(-1,1,0);
         let color = utils.randomColor(colors);
         let maxOpacity = 0.6;
-        let x = utils.randomIntFromRange(45,innerWidth-45,0);
-        let y = utils.randomIntFromRange(45,innerHeight-45,0);
-        let radius = utils.randomFloatFromRange(10,40,0);
+        let x = utils.randomIntFromRange(maxRadius+1,innerWidth-maxRadius-1,0);
+        let y = utils.randomIntFromRange(maxRadius+1,innerHeight-maxRadius-1,0);
+        let radius = utils.randomFloatFromRange(8,maxRadius,0);
         let ball = new Ball(x,y,radius,color,maxOpacity,speedX,speedY);
         while(hasOverlap(ballArray, ball)) {
           x = utils.randomIntFromRange(25,innerWidth-25,0);
@@ -122,11 +122,15 @@ function init() {
 
 // Animation Loop
 function animate() {
-    console.log("animate");
+    console.log("ani")
     c.clearRect(0,0,innerWidth,innerHeight);
+    // testBall.update();
+    // myMath.attractionGravity(mouse,testBall);
     requestAnimationFrame(animate);
+
     for(let i=0;i<ballArray.length;i++){
-        for(let j=i+1;j<ballArray.length;j++) {
+        myMath.attractionGravity(mouse, ballArray[i]);
+        for(let j=0;j<ballArray.length;j++) {
           if(utils.distance(ballArray[i].x, ballArray[i].y, ballArray[j].x, ballArray[j].y) <= ballArray[i].radius + ballArray[j].radius) {
             myMath.resolveCollision(ballArray[i], ballArray[j]);
           }
